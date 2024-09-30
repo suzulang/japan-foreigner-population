@@ -16,10 +16,18 @@ const Index = () => {
 
   useEffect(() => {
     if (foreignPopulationStats) {
-      const uniqueNationalities = [...new Set(foreignPopulationStats.map(stat => stat.nationality))];
+      const uniqueNationalities = [...new Set(foreignPopulationStats.map(stat => stat.nationality))].filter(nat => nat !== '総数');
       const uniquePurposes = [...new Set(foreignPopulationStats.map(stat => stat.purpose))];
       setNationalities(uniqueNationalities);
       setPurposes(uniquePurposes);
+      
+      // 默认渲染总数数据
+      const totalData = foreignPopulationStats.filter(stat => stat.nationality === '総数');
+      const chartData = totalData.map(stat => ({
+        month: format(new Date(stat.month), 'yyyy-MM'),
+        population: stat.value
+      })).sort((a, b) => new Date(a.month) - new Date(b.month));
+      setFilteredData(chartData);
     }
   }, [foreignPopulationStats]);
 
@@ -31,10 +39,15 @@ const Index = () => {
   if (error) return <div>Error: {error.message}</div>;
 
   const handleStartSurvey = () => {
-    const filtered = foreignPopulationStats.filter(stat => 
-      (!nationality || stat.nationality === nationality) &&
-      (!purpose || stat.purpose === purpose)
-    );
+    let filtered = foreignPopulationStats;
+    if (nationality) {
+      filtered = filtered.filter(stat => stat.nationality === nationality);
+    } else {
+      filtered = filtered.filter(stat => stat.nationality === '総数');
+    }
+    if (purpose) {
+      filtered = filtered.filter(stat => stat.purpose === purpose);
+    }
 
     const chartData = filtered.map(stat => ({
       month: format(new Date(stat.month), 'yyyy-MM'),
@@ -102,7 +115,7 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={filteredData.length > 0 ? filteredData : []}>
+              <LineChart data={filteredData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
