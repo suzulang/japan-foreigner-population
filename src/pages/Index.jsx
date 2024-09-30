@@ -3,18 +3,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
-const data = [
-  { year: 2015, population: 2.3 },
-  { year: 2016, population: 2.4 },
-  { year: 2017, population: 2.5 },
-  { year: 2018, population: 2.7 },
-  { year: 2019, population: 2.9 },
-  { year: 2020, population: 2.8 },
-  { year: 2021, population: 2.7 },
-];
+import { useForeignPopulationStats } from '@/integrations/supabase';
 
 const Index = () => {
+  const { data: foreignPopulationStats, isLoading, error } = useForeignPopulationStats();
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  // 处理数据以适应图表格式
+  const chartData = foreignPopulationStats?.reduce((acc, curr) => {
+    const year = new Date(curr.month).getFullYear();
+    const existingYear = acc.find(item => item.year === year);
+    if (existingYear) {
+      existingYear.population += curr.value;
+    } else {
+      acc.push({ year, population: curr.value });
+    }
+    return acc;
+  }, []).sort((a, b) => a.year - b.year);
+
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <h1 className="text-3xl font-bold text-center text-blue-800 mb-8">欢迎来到日本外国人口变化调查</h1>
@@ -73,11 +81,11 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={data}>
+              <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="year" />
-                <YAxis domain={[2, 3]} tickFormatter={(value) => `${value}M`} />
-                <Tooltip formatter={(value) => [`${value}M`, '外国人口']} />
+                <YAxis domain={['auto', 'auto']} tickFormatter={(value) => `${value / 1000000}M`} />
+                <Tooltip formatter={(value) => [`${value / 1000000}M`, '外国人口']} />
                 <Line type="monotone" dataKey="population" stroke="#8884d8" activeDot={{ r: 8 }} />
               </LineChart>
             </ResponsiveContainer>
