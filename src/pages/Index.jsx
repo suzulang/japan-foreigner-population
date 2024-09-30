@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -7,21 +7,32 @@ import { useForeignPopulationStats } from '@/integrations/supabase';
 
 const Index = () => {
   const { data: foreignPopulationStats, isLoading, error } = useForeignPopulationStats();
+  const [nationality, setNationality] = useState('');
+  const [region, setRegion] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
-  // 处理数据以适应图表格式
-  const chartData = foreignPopulationStats?.reduce((acc, curr) => {
-    const year = new Date(curr.month).getFullYear();
-    const existingYear = acc.find(item => item.year === year);
-    if (existingYear) {
-      existingYear.population += curr.value;
-    } else {
-      acc.push({ year, population: curr.value });
-    }
-    return acc;
-  }, []).sort((a, b) => a.year - b.year);
+  const handleStartSurvey = () => {
+    const filtered = foreignPopulationStats.filter(stat => 
+      (!nationality || stat.nationality === nationality) &&
+      (!region || stat.purpose.toLowerCase().includes(region.toLowerCase()))
+    );
+
+    const chartData = filtered.reduce((acc, curr) => {
+      const year = new Date(curr.month).getFullYear();
+      const existingYear = acc.find(item => item.year === year);
+      if (existingYear) {
+        existingYear.population += curr.value;
+      } else {
+        acc.push({ year, population: curr.value });
+      }
+      return acc;
+    }, []).sort((a, b) => a.year - b.year);
+
+    setFilteredData(chartData);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -41,31 +52,31 @@ const Index = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">国籍选择</label>
-                <Select>
+                <Select onValueChange={setNationality}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="选择国籍" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="china">中国</SelectItem>
-                    <SelectItem value="usa">美国</SelectItem>
-                    <SelectItem value="uk">英国</SelectItem>
+                    <SelectItem value="中国">中国</SelectItem>
+                    <SelectItem value="美国">美国</SelectItem>
+                    <SelectItem value="英国">英国</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">居住地区</label>
-                <Select>
+                <Select onValueChange={setRegion}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="选择居住地区" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="tokyo">东京</SelectItem>
-                    <SelectItem value="osaka">大阪</SelectItem>
-                    <SelectItem value="kyoto">京都</SelectItem>
+                    <SelectItem value="东京">东京</SelectItem>
+                    <SelectItem value="大阪">大阪</SelectItem>
+                    <SelectItem value="京都">京都</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <Button className="w-full">开始调查</Button>
+              <Button className="w-full" onClick={handleStartSurvey}>开始调查</Button>
             </div>
           </CardContent>
         </Card>
@@ -81,7 +92,16 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartData}>
+              <LineChart data={filteredData.length > 0 ? filteredData : foreignPopulationStats?.reduce((acc, curr) => {
+                const year = new Date(curr.month).getFullYear();
+                const existingYear = acc.find(item => item.year === year);
+                if (existingYear) {
+                  existingYear.population += curr.value;
+                } else {
+                  acc.push({ year, population: curr.value });
+                }
+                return acc;
+              }, []).sort((a, b) => a.year - b.year)}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="year" />
                 <YAxis domain={['auto', 'auto']} tickFormatter={(value) => `${value / 1000000}M`} />
