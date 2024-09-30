@@ -4,11 +4,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useForeignPopulationStats } from '@/integrations/supabase';
+import { format } from 'date-fns';
 
 const Index = () => {
   const { data: foreignPopulationStats, isLoading, error } = useForeignPopulationStats();
   const [nationality, setNationality] = useState('');
-  const [region, setRegion] = useState('');
+  const [purpose, setPurpose] = useState('');
   const [filteredData, setFilteredData] = useState([]);
 
   if (isLoading) return <div>Loading...</div>;
@@ -17,19 +18,13 @@ const Index = () => {
   const handleStartSurvey = () => {
     const filtered = foreignPopulationStats.filter(stat => 
       (!nationality || stat.nationality === nationality) &&
-      (!region || stat.purpose.toLowerCase().includes(region.toLowerCase()))
+      (!purpose || stat.purpose === purpose)
     );
 
-    const chartData = filtered.reduce((acc, curr) => {
-      const year = new Date(curr.month).getFullYear();
-      const existingYear = acc.find(item => item.year === year);
-      if (existingYear) {
-        existingYear.population += curr.value;
-      } else {
-        acc.push({ year, population: curr.value });
-      }
-      return acc;
-    }, []).sort((a, b) => a.year - b.year);
+    const chartData = filtered.map(stat => ({
+      month: format(new Date(stat.month), 'yyyy-MM'),
+      population: stat.value
+    })).sort((a, b) => new Date(a.month) - new Date(b.month));
 
     setFilteredData(chartData);
   };
@@ -59,20 +54,18 @@ const Index = () => {
                   <SelectContent>
                     <SelectItem value="中国">中国</SelectItem>
                     <SelectItem value="美国">美国</SelectItem>
-                    <SelectItem value="英国">英国</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">居住地区</label>
-                <Select onValueChange={setRegion}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">目的</label>
+                <Select onValueChange={setPurpose}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="选择居住地区" />
+                    <SelectValue placeholder="选择目的" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="东京">东京</SelectItem>
-                    <SelectItem value="大阪">大阪</SelectItem>
-                    <SelectItem value="京都">京都</SelectItem>
+                    <SelectItem value="工作">工作</SelectItem>
+                    <SelectItem value="学习">学习</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -92,20 +85,14 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={filteredData.length > 0 ? filteredData : foreignPopulationStats?.reduce((acc, curr) => {
-                const year = new Date(curr.month).getFullYear();
-                const existingYear = acc.find(item => item.year === year);
-                if (existingYear) {
-                  existingYear.population += curr.value;
-                } else {
-                  acc.push({ year, population: curr.value });
-                }
-                return acc;
-              }, []).sort((a, b) => a.year - b.year)}>
+              <LineChart data={filteredData.length > 0 ? filteredData : foreignPopulationStats?.map(stat => ({
+                month: format(new Date(stat.month), 'yyyy-MM'),
+                population: stat.value
+              })).sort((a, b) => new Date(a.month) - new Date(b.month))}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="year" />
-                <YAxis domain={['auto', 'auto']} tickFormatter={(value) => `${value / 1000000}M`} />
-                <Tooltip formatter={(value) => [`${value / 1000000}M`, '外国人口']} />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
                 <Line type="monotone" dataKey="population" stroke="#8884d8" activeDot={{ r: 8 }} />
               </LineChart>
             </ResponsiveContainer>
