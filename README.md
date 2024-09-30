@@ -1,70 +1,65 @@
-# Welcome to your GPT Engineer project
+# 日本の外国人人口変動調査アプリ
 
-## Project info
+## 概要
 
-**URL**: https://run.gptengineer.app/projects/d7f31155-0ead-4656-ab5f-670855c694a2/improve
+このアプリケーションは、日本における外国人人口の変動を視覚化し、分析するためのツールです。ユーザーは国籍や滞在目的を選択し、それに基づいた人口統計データをグラフで確認することができます。
 
-## How can I edit this code?
+## 機能
 
-There are several ways of editing your application.
+- 国籍選択
+- 滞在目的選択（就労、留学、家族滞在など）
+- 選択条件に基づいた人口変動のグラフ表示
+- 年月表示のX軸
 
-**Use GPT Engineer**
+## 技術スタック
 
-Simply visit the GPT Engineer project at [GPT Engineer](https://gptengineer.app/projects/d7f31155-0ead-4656-ab5f-670855c694a2/improve) and start prompting.
+- React.js
+- Recharts（グラフライブラリ）
+- カスタムUIコンポーネント
 
-Changes made via gptengineer.app will be committed automatically to this repo.
+## セットアップ
 
-**Use your preferred IDE**
+1. リポジトリをクローンします：
+   ```
+   git clone [リポジトリのURL]
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in the GPT Engineer UI.
+2. プロジェクトディレクトリに移動します：
+   ```
+   cd [プロジェクト名]
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+3. 依存関係をインストールします：
+   ```
+   pnpm install
+   ```
 
-Follow these steps:
+4. アプリケーションを起動します：
+   ```
+   pnpm run dev
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 使用方法
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+1. アプリケーションを開きます。
+2. 「調査情報」カードで国籍と滞在目的を選択します。
+3. 「調査開始」ボタンをクリックします。
+4. 「外国人人口変動傾向」カードにグラフが表示されます。
 
-# Step 3: Install the necessary dependencies.
-npm i
+## プロジェクト構造
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+- `src/pages/Index.jsx`: メインコンポーネント
+- `src/components/SurveyInfoCard.jsx`: 調査情報入力用コンポーネント
+- `src/components/PopulationTrendCard.jsx`: グラフ表示用コンポーネント
 
-**Edit a file directly in GitHub**
+## 貢献
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+プロジェクトへの貢献を歓迎します。プルリクエストを送る前に、必ずイシューを作成して変更内容について議論してください。
 
-**Use GitHub Codespaces**
+## ライセンス
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+[ライセンス情報を記載]
 
-## What technologies are used for this project?
+## 連絡先
 
-This project is built with .
-
-- Vite
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-All GPT Engineer projects can be deployed directly via the GPT Engineer app.
-
-Simply visit your project at [GPT Engineer](https://gptengineer.app/projects/d7f31155-0ead-4656-ab5f-670855c694a2/improve) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.gptengineer.app/tips-tricks/custom-domain/)
+[あなたの連絡先情報を記載]
