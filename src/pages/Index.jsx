@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -7,10 +7,25 @@ import { useForeignPopulationStats } from '@/integrations/supabase';
 import { format } from 'date-fns';
 
 const Index = () => {
-  const { data: foreignPopulationStats, isLoading, error } = useForeignPopulationStats();
+  const { data: foreignPopulationStats, isLoading, error, refetch } = useForeignPopulationStats();
   const [nationality, setNationality] = useState('');
   const [purpose, setPurpose] = useState('');
   const [filteredData, setFilteredData] = useState([]);
+  const [nationalities, setNationalities] = useState([]);
+  const [purposes, setPurposes] = useState([]);
+
+  useEffect(() => {
+    if (foreignPopulationStats) {
+      const uniqueNationalities = [...new Set(foreignPopulationStats.map(stat => stat.nationality))];
+      const uniquePurposes = [...new Set(foreignPopulationStats.map(stat => stat.purpose))];
+      setNationalities(uniqueNationalities);
+      setPurposes(uniquePurposes);
+    }
+  }, [foreignPopulationStats]);
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -52,8 +67,9 @@ const Index = () => {
                     <SelectValue placeholder="选择国籍" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="中国">中国</SelectItem>
-                    <SelectItem value="美国">美国</SelectItem>
+                    {nationalities.map(nat => (
+                      <SelectItem key={nat} value={nat}>{nat}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -64,8 +80,9 @@ const Index = () => {
                     <SelectValue placeholder="选择目的" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="工作">工作</SelectItem>
-                    <SelectItem value="学习">学习</SelectItem>
+                    {purposes.map(pur => (
+                      <SelectItem key={pur} value={pur}>{pur}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -85,10 +102,7 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={filteredData.length > 0 ? filteredData : foreignPopulationStats?.map(stat => ({
-                month: format(new Date(stat.month), 'yyyy-MM'),
-                population: stat.value
-              })).sort((a, b) => new Date(a.month) - new Date(b.month))}>
+              <LineChart data={filteredData.length > 0 ? filteredData : []}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
