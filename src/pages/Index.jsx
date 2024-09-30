@@ -1,11 +1,88 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+const data = [
+  { year: 2015, population: 2.3 },
+  { year: 2016, population: 2.4 },
+  { year: 2017, population: 2.5 },
+  { year: 2018, population: 2.7 },
+  { year: 2019, population: 2.9 },
+  { year: 2020, population: 2.8 },
+  { year: 2021, population: 2.7 },
+];
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-gray-100 p-8">
+      <h1 className="text-3xl font-bold text-center text-blue-800 mb-8">欢迎来到日本外国人口变化调查</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">
+              <span className="inline-block mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              </span>
+              调查信息
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">国籍选择</label>
+                <Select>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="选择国籍" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="china">中国</SelectItem>
+                    <SelectItem value="usa">美国</SelectItem>
+                    <SelectItem value="uk">英国</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">居住地区</label>
+                <Select>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="选择居住地区" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="tokyo">东京</SelectItem>
+                    <SelectItem value="osaka">大阪</SelectItem>
+                    <SelectItem value="kyoto">京都</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button className="w-full">开始调查</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">
+              <span className="inline-block mr-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              </span>
+              外国人口变化趋势
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={data}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="year" />
+                <YAxis domain={[2, 3]} tickFormatter={(value) => `${value}M`} />
+                <Tooltip formatter={(value) => [`${value}M`, '外国人口']} />
+                <Line type="monotone" dataKey="population" stroke="#8884d8" activeDot={{ r: 8 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
