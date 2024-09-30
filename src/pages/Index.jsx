@@ -4,7 +4,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useForeignPopulationStats } from '@/integrations/supabase';
-import { format } from 'date-fns';
 
 const Index = () => {
   const { data: foreignPopulationStats, isLoading, error, refetch } = useForeignPopulationStats();
@@ -21,10 +20,10 @@ const Index = () => {
       setNationalities(uniqueNationalities);
       setPurposes(uniquePurposes);
       
-      // 默认渲染总数数据
+      // Default to rendering total data
       const totalData = foreignPopulationStats.filter(stat => stat.nationality === '総数');
       const chartData = totalData.map(stat => ({
-        month: format(new Date(stat.month), 'yyyy-MM'),
+        month: stat.month, // Use the actual month from the database
         population: stat.value
       })).sort((a, b) => new Date(a.month) - new Date(b.month));
       setFilteredData(chartData);
@@ -50,7 +49,7 @@ const Index = () => {
     }
 
     const chartData = filtered.map(stat => ({
-      month: format(new Date(stat.month), 'yyyy-MM'),
+      month: stat.month, // Use the actual month from the database
       population: stat.value
     })).sort((a, b) => new Date(a.month) - new Date(b.month));
 
