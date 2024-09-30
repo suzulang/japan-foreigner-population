@@ -7,24 +7,6 @@ const fromSupabase = async (query) => {
     return data;
 };
 
-/*
-### foreign_population_stats
-
-| name        | type                     | format    | required |
-|-------------|--------------------------|-----------|----------|
-| id          | integer                  | bigint    | true     |
-| nationality | string                   | varchar   | true     |
-| purpose     | string                   | varchar   | true     |
-| month       | string                   | date      | true     |
-| value       | integer                  | integer   | true     |
-| created_at  | string                   | timestamp | true     |
-| updated_at  | string                   | timestamp | true     |
-
-Note: 
-- 'id' is the Primary Key.
-- 'created_at' and 'updated_at' have default values of the current timestamp in UTC.
-*/
-
 export const useForeignPopulationStat = (id) => useQuery({
     queryKey: ['foreign_population_stats', id],
     queryFn: () => fromSupabase(supabase.from('foreign_population_stats').select('*').eq('id', id).single()),
@@ -34,7 +16,7 @@ export const useForeignPopulationStats = () => useQuery({
     queryKey: ['foreign_population_stats'],
     queryFn: async () => {
         const data = await fromSupabase(supabase.from('foreign_population_stats').select('*'));
-        console.log('Fetched data:', data); // 调试信息
+        console.log('取得したデータ:', data);
         return data;
     },
 });
