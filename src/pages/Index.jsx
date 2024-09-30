@@ -7,22 +7,18 @@ import { useForeignPopulationStats } from '@/integrations/supabase';
 
 const Index = () => {
   const { data: foreignPopulationStats, isLoading, error, refetch } = useForeignPopulationStats();
-  const [nationality, setNationality] = useState('');
+  const [nationality, setNationality] = useState('総数');
+  const [purpose, setPurpose] = useState('総数');
   const [filteredData, setFilteredData] = useState([]);
   const [nationalities, setNationalities] = useState([]);
 
   useEffect(() => {
     if (foreignPopulationStats) {
-      const uniqueNationalities = [...new Set(foreignPopulationStats.map(stat => stat.nationality))].filter(nat => nat !== '総数');
+      const uniqueNationalities = [...new Set(foreignPopulationStats.map(stat => stat.nationality))];
       setNationalities(uniqueNationalities);
       
       // デフォルトで総数のデータを表示
-      const totalData = foreignPopulationStats.filter(stat => stat.nationality === '総数');
-      const chartData = totalData.map(stat => ({
-        month: stat.month,
-        population: stat.value
-      })).sort((a, b) => new Date(a.month) - new Date(b.month));
-      setFilteredData(chartData);
+      filterAndSetData('総数', '総数');
     }
   }, [foreignPopulationStats]);
 
@@ -33,24 +29,25 @@ const Index = () => {
   if (isLoading) return <div>読み込み中...</div>;
   if (error) return <div>エラー: {error.message}</div>;
 
-  const handleStartSurvey = () => {
+  const filterAndSetData = (selectedNationality, selectedPurpose) => {
     let filtered = foreignPopulationStats;
-    if (nationality) {
-      filtered = filtered.filter(stat => stat.nationality === nationality);
-    } else {
-      filtered = filtered.filter(stat => stat.nationality === '総数');
+    if (selectedNationality) {
+      filtered = filtered.filter(stat => stat.nationality === selectedNationality);
     }
-
-    console.log('フィルタリングされたデータ:', filtered);
+    if (selectedPurpose) {
+      filtered = filtered.filter(stat => stat.purpose === selectedPurpose);
+    }
 
     const chartData = filtered.map(stat => ({
       month: stat.month,
       population: stat.value
     })).sort((a, b) => new Date(a.month) - new Date(b.month));
 
-    console.log('チャートデータ:', chartData);
-
     setFilteredData(chartData);
+  };
+
+  const handleStartSurvey = () => {
+    filterAndSetData(nationality, purpose);
   };
 
   return (
@@ -71,7 +68,7 @@ const Index = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">国籍選択</label>
-                <Select onValueChange={setNationality}>
+                <Select onValueChange={setNationality} defaultValue="総数">
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="国籍を選択" />
                   </SelectTrigger>
@@ -79,6 +76,21 @@ const Index = () => {
                     {nationalities.map(nat => (
                       <SelectItem key={nat} value={nat}>{nat}</SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">目的選択</label>
+                <Select onValueChange={setPurpose} defaultValue="総数">
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="目的を選択" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="総数">総数</SelectItem>
+                    <SelectItem value="就労">就労</SelectItem>
+                    <SelectItem value="留学">留学</SelectItem>
+                    <SelectItem value="家族滞在">家族滞在</SelectItem>
+                    <SelectItem value="その他">その他</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
