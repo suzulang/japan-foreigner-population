@@ -32,7 +32,11 @@ export const useForeignPopulationStat = (id) => useQuery({
 
 export const useForeignPopulationStats = () => useQuery({
     queryKey: ['foreign_population_stats'],
-    queryFn: () => fromSupabase(supabase.from('foreign_population_stats').select('*')),
+    queryFn: async () => {
+        const data = await fromSupabase(supabase.from('foreign_population_stats').select('*'));
+        console.log('Fetched data:', data); // 调试信息
+        return data;
+    },
 });
 
 export const useAddForeignPopulationStat = () => {

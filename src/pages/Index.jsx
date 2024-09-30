@@ -23,7 +23,7 @@ const Index = () => {
       // Default to rendering total data
       const totalData = foreignPopulationStats.filter(stat => stat.nationality === '総数');
       const chartData = totalData.map(stat => ({
-        month: stat.month, // Use the actual month from the database
+        month: stat.month,
         population: stat.value
       })).sort((a, b) => new Date(a.month) - new Date(b.month));
       setFilteredData(chartData);
@@ -48,10 +48,14 @@ const Index = () => {
       filtered = filtered.filter(stat => stat.purpose === purpose);
     }
 
+    console.log('Filtered data:', filtered); // 调试信息
+
     const chartData = filtered.map(stat => ({
-      month: stat.month, // Use the actual month from the database
+      month: stat.month,
       population: stat.value
     })).sort((a, b) => new Date(a.month) - new Date(b.month));
+
+    console.log('Chart data:', chartData); // 调试信息
 
     setFilteredData(chartData);
   };
@@ -113,15 +117,19 @@ const Index = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={filteredData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="population" stroke="#8884d8" activeDot={{ r: 8 }} />
-              </LineChart>
-            </ResponsiveContainer>
+            {filteredData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={filteredData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="population" stroke="#8884d8" activeDot={{ r: 8 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="text-center text-gray-500">没有可用的数据</div>
+            )}
           </CardContent>
         </Card>
       </div>
